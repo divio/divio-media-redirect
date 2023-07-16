@@ -7,7 +7,7 @@ class Form(forms.BaseForm):
     redirected_storages = forms.CharField(
         "Redirected storages",
         required=True,
-        initial='{"DEFAULT_STORAGE_DSN": "media"}',
+        initial=json.dumps({"DEFAULT_STORAGE_DSN": "media"}),
         help_text=(
             "A dictionary, in JSON format, of storage DSN setting keys "
             "mapping to a prefix for the redirect view."
