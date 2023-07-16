@@ -19,9 +19,11 @@ class Form(forms.BaseForm):
 
         WrappingRedirectingStorage.register()
 
-        redirected_storages = json.loads(data["redirected_storages"])
+        settings["REDIRECTED_STORAGES"] = json.loads(
+            data["redirected_storages"]
+        )
 
-        for key, prefix in redirected_storages.items():
+        for key, prefix in settings["REDIRECTED_STORAGES"].items():
             settings[key] = WrappingRedirectingStorage.wrap(
                 settings[key], prefix=prefix
             )
