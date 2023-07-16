@@ -1,0 +1,6 @@
+{
+    "package-name": "divio-media-redirect",
+    "installed-apps": [
+        "divio_media_redirect"
+    ]
+}
