@@ -1,0 +1,5 @@
+[tracker:gitlab]
+project_id = 47728971
+
+[timer:timewarrior]
+project_id = divio-media-redirect
