@@ -3,3 +3,6 @@ project_id = 47728971
 
 [timer:timewarrior]
 project_id = divio-media-redirect
+
+[repository]
+base_branch = main
