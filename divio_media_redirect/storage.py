@@ -12,6 +12,12 @@ from django_storage_url.backends import (
 
 
 SCHEME = "redirect"
+UNWRAPPABLE_SCHEMES = {SCHEME, "file"}
+
+
+class UnwrappableStorage(Exception):
+    def __init__(self, scheme):
+        self.scheme = scheme
 
 
 class WrappingRedirectingStorage:
@@ -22,7 +28,8 @@ class WrappingRedirectingStorage:
     @classmethod
     def wrap(cls, dsn, prefix):
         url = furl.furl(dsn)
-        assert url.scheme != SCHEME
+        if url.scheme in UNWRAPPABLE_SCHEMES:
+            raise UnwrappableStorage(url.scheme)
         url.args["original_scheme"] = url.scheme
         url.args["redirect_view_prefix"] = prefix
         url.scheme = SCHEME

@@ -1,6 +1,10 @@
 import json
+import logging
 
 from aldryn_client import forms
+
+
+logger = logging.getLogger(__name__)
 
 
 class Form(forms.BaseForm):
@@ -15,7 +19,10 @@ class Form(forms.BaseForm):
     )
 
     def to_settings(self, data, settings):
-        from divio_media_redirect.storage import WrappingRedirectingStorage
+        from divio_media_redirect.storage import (
+            WrappingRedirectingStorage,
+            UnwrappableStorage,
+        )
 
         WrappingRedirectingStorage.register()
 
@@ -23,11 +30,23 @@ class Form(forms.BaseForm):
             data["redirected_storages"]
         )
 
-        for key, prefix in settings["REDIRECTED_STORAGES"].items():
-            settings[key] = WrappingRedirectingStorage.wrap(
-                settings[key], prefix=prefix
-            )
+        wrapped = False
 
-        settings["ADDON_URLS"].append("divio_media_redirect.urls")
+        for key, prefix in settings["REDIRECTED_STORAGES"].items():
+            try:
+                settings[key] = WrappingRedirectingStorage.wrap(
+                    settings[key], prefix=prefix
+                )
+            except UnwrappableStorage as e:
+                logger.warning(
+                    "Ignoring unwrappable storage `%s` with scheme `%s`",
+                    key,
+                    e.scheme,
+                )
+                continue
+            wrapped = True
+
+        if wrapped:
+            settings["ADDON_URLS"].append("divio_media_redirect.urls")
 
         return settings
