@@ -1,5 +1,5 @@
 import hashlib
-from urllib.parse import ParseResult, unquote, urlparse, urlunparse
+from urllib.parse import ParseResult, quote, unquote, urlparse, urlunparse
 
 from django.shortcuts import redirect
 from django.urls import path, reverse
@@ -48,7 +48,7 @@ class WrappingRedirectingStorage:
 
     def make_redirect_url_entry(self):
         return path(
-            f"{self._view_prefix}/<path:path>",
+            f"{self._view_prefix}/",
             self._redirect_to_storage_location,
             name=self._url_name,
         )
@@ -59,7 +59,9 @@ class WrappingRedirectingStorage:
         path = unquote(url.path)
         path = path[len(self._base.path) :]
 
-        new_url = reverse(self._url_name, kwargs={"path": path})
+        # This URL is manually constructed due to quoting issues around RFC3986
+        new_url = reverse(self._url_name) + quote(path)
+
         if url.query:
             new_url = f"{new_url}?{url.query}"
         if url.fragment:
